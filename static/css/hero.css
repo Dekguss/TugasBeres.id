@@ -1,0 +1,37 @@
+.floating-shape {
+    position: absolute;
+    animation: float 6s ease-in-out infinite;
+    opacity: 0.15;
+}
+
+.shape-1 {
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    animation-delay: 1.2s;
+}
+
+.shape-3 {
+    animation-delay: 2.4s;
+}
+
+.shape-4 {
+    animation-delay: 3.6s;
+}
+
+.shape-5 {
+    animation-delay: 4.8s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-30px) rotate(8deg);
+    }
+}

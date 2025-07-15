@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JokiYok</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#818CF8",
+                        secondary: "#F3F4F6",
+                    },
+                    borderRadius: {
+                        none: "0px",
+                        sm: "4px",
+                        DEFAULT: "8px",
+                        md: "12px",
+                        lg: "16px",
+                        xl: "20px",
+                        "2xl": "24px",
+                        "3xl": "32px",
+                        full: "9999px",
+                        button: "8px",
+                    },
+                },
+            },
+        };
+    </script>
+
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+
+    <!-- icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+
+    <!-- css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/galery.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/service.css') }}">
+
+    <!-- js -->
+    <script src="{{ url_for('static', filename='js/cek_order.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/form.js') }}"></script>
+
+    <style>
+        /* Menghilangkan panah default pada select */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: none;
+            padding-right: 1rem;
+        }
+
+        /* Menghilangkan panah di IE */
+        select::-ms-expand {
+            display: none;
+        }
+    </style>
+
+    <script>
+        // Animasi Scroll
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        // Tutup Mobile Menu
+                        const mobileMenu = document.getElementById('mobile-menu');
+                        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="#hero"
+                    class="text-2xl font-['Pacifico'] text-primary mr-2 hover:opacity-80 transition-opacity">
+                    <span>Tugas</span><span class="text-gray-800">Beres.id</span>
+                </a>
+            </div>
+            <!-- Navbar -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#hero" class="text-gray-600 hover:text-primary text-lg">Beranda</a>
+                <a href="#layanan" class="text-gray-600 hover:text-primary text-lg">Layanan</a>
+                <a href="#carajoki" class="text-gray-600 hover:text-primary text-lg">Cara Joki</a>
+                <a href="#form" class="text-gray-600 hover:text-primary text-lg">Form Joki</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-2xl text-gray-800 hover:text-primary transition-colors"
+                onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <i class="ri-menu-line"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <div class="container mx-auto px-4 py-2">
+                <a href="#hero" class="block py-3 text-gray-800 hover:text-primary border-b border-gray-100">Beranda</a>
+                <a href="#layanan"
+                    class="block py-3 text-gray-800 hover:text-primary border-b border-gray-100">Layanan</a>
+                <a href="#carajoki" class="block py-3 text-gray-800 hover:text-primary border-b border-gray-100">Cara
+                    Joki</a>
+                <a href="#form" class="block py-3 text-gray-800 hover:text-primary border-b border-gray-100">Form
+                    Joki</a>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Hero Section -->
+    <section class="w-full relative overflow-hidden bg-gray-50 pt-28" id="hero">
+        <div class="container mx-auto px-4 pt-28 pb-40 md:py-20 relative z-10">
+            <div class="w-full md:w-3/4 lg:w-2/3 mx-auto flex flex-col items-center text-center">
+                <span class="text-primary font-medium mb-2 bg-primary/10 px-4 py-1 rounded-full text-sm md:text-base">
+                    Welcome to TugasBeres.id
+                </span>
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+                    Tugas Menumpuk?<span class="text-primary block md:inline"> Kami Siap Bantu!</span>
+                </h1>
+                <p class="text-base md:text-lg text-gray-700 mb-8 md:mb-10 leading-relaxed max-w-2xl px-4">
+                    Solusi terpercaya untuk tugas kuliah dan sekolah Anda. Tim kami siap membantu Anda mengerjakan tugas
+                    dengan hasil berkualitas dan tepat waktu.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full px-4">
+                    <a href="#form"
+                        class="bg-primary text-white px-6 py-3 w-full sm:w-auto rounded-full font-medium hover:bg-purple-800 hover:scale-105 transition-all duration-300 whitespace-nowrap flex items-center justify-center shadow-lg shadow-primary/20 hover:shadow-primary/30">
+                        Joki Sekarang
+                        <i class="ri-arrow-right-up-line ml-2 transition-transform group-hover:translate-x-1"></i>
+                    </a>
+                    <button onclick="openCekOrderModal()"
+                        class="bg-white border-2 border-primary text-gray-700 hover:text-primary px-6 py-3 w-full sm:w-auto rounded-full flex items-center justify-center font-medium transition-all duration-300 whitespace-nowrap hover:scale-105 hover:border-purple-800 group h-[50px]">
+                        <div
+                            class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full mr-2 group-hover:bg-primary/20">
+                            <i class="ri-file-list-3-line text-primary"></i>
+                        </div>
+                        Cek Orderan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cek Orderan -->
+        <div id="cekOrderModal" class="fixed inset-0 bg-black/20 z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-xl max-w-md w-full p-6 relative">
+                <button onclick="closeCekOrderModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Cek Status Orderan</h3>
+                <form id="cekOrderForm" class="space-y-4">
+                    <div>
+                        <label for="kode_order" class="block text-sm font-medium text-gray-700 mb-1">Masukkan Kode
+                            Order</label>
+                        <input type="text" id="kode_order" name="kode_order" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                            placeholder="Contoh: AbCd1234">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium hover:bg-purple-800 transition flex items-center justify-center">
+                        <i class="ri-search-line mr-2"></i> Cek Status
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Detail Order -->
+        <div id="orderDetailModal" class="fixed inset-0 bg-black/20 z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+                <button onclick="closeOrderDetailModal()"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
+
+                <div class="p-6 mt-12">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">Detail Order</h3>
+                            <p class="text-sm text-gray-500 mt-1" id="orderCode">Kode: -</p>
+                        </div>
+                        <span id="orderStatus"
+                            class="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            Loading...
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Nama</h4>
+                                <p id="orderNama" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Jenis Tugas</h4>
+                                <p id="orderJenis" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">No. WhatsApp</h4>
+                                <p id="orderWa" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Harga</h4>
+                                <p id="orderHarga" class="mt-1 text-gray-900">-</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Deadline</h4>
+                                <p id="orderDeadline" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Dibuat Pada</h4>
+                                <p id="orderCreatedAt" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">File</h4>
+                                <p id="orderFile" class="mt-1 text-gray-900">-</p>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">File Selesai</h4>
+                                <p id="completedFile" class="mt-1 text-gray-900"> -</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-500">Deskripsi Tugas</h4>
+                        <p id="orderDeskripsi" class="mt-2 text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-line">
+                            -</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Shape -->
+        <div class="md:block floating-shape pt-32 shape-1 top-20 right-20">
+            <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="80" stroke="#7e22ce" stroke-width="4" fill="none" />
+            </svg>
+        </div>
+        <div class="hidden md:block floating-shape shape-2 top-40 right-1/4">
+            <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="176" height="176" stroke="#f59e0b" stroke-width="4" fill="none" />
+            </svg>
+        </div>
+        <div class="hidden md:block floating-shape shape-3 bottom-20 right-1/3">
+            <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="80,0 160,160 0,160" stroke="#7e22ce" stroke-width="4" fill="none" />
+            </svg>
+        </div>
+        <div class="md:block floating-shape pt-28 shape-4 top-1/2 md:top-1/3 left-20">
+            <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="31" y="31" width="156" height="156" transform="rotate(45 110 110)" stroke="#f59e0b"
+                    stroke-width="4" fill="none" />
+            </svg>
+        </div>
+        <div class="hidden md:block floating-shape shape-5 bottom-40 left-1/4">
+            <svg width="190" height="190" viewBox="0 0 190 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="95" cy="95" r="93" stroke="#7e22ce" stroke-width="4" fill="none" />
+            </svg>
+        </div>
+    </section>
+
+
+    <!-- Image Galery Section -->
+    <section class="hidden container md:block mx-auto px-4 py-12 -mt-16 relative z-20 bg-gray-50">
+        <div class="flex flex-wrap justify-center">
+            <div class="gallery-item relative shadow-lg rounded-lg overflow-hidden m-2 opacity-0 translate-x-[-100px] animate-slide-in"
+                style="--rotation: -5deg; animation-delay: 0.2s">
+                <img src="https://readdy.ai/api/search-image?query=A%20minimalist%20scene%20of%20a%20childs%20hands%20working%20on%20a%20simple%20art%20project%20against%20a%20clean%20white%20background.%20The%20focus%20is%20on%20the%20creative%20process%20with%20minimal%20distractions%20in%20the%20frame.&width=300&height=300&seq=img1&orientation=squarish"
+                    alt="Learning activity" class="w-64 h-64 object-cover object-top">
+            </div>
+            <div class="gallery-item relative shadow-lg rounded-lg overflow-hidden m-2 z-10 opacity-0 translate-x-[-100px] animate-slide-in"
+                style="--rotation: 3deg; animation-delay: 0.4s">
+                <img src="https://readdy.ai/api/search-image?query=A%20serene%20study%20corner%20with%20an%20open%20book%20and%20simple%20educational%20materials%20on%20a%20clean%20desk.%20Soft%20natural%20lighting%20and%20minimal%20decorative%20elements%20create%20a%20calm%20learning%20atmosphere.&width=300&height=300&seq=img2&orientation=squarish"
+                    alt="Learning activity" class="w-64 h-64 object-cover object-top">
+            </div>
+            <div class="gallery-item relative shadow-lg rounded-lg overflow-hidden m-2 opacity-0 translate-x-[-100px] animate-slide-in"
+                style="--rotation: -2deg; animation-delay: 0.6s">
+                <img src="https://readdy.ai/api/search-image?query=A%20clean%2C%20organized%20science%20table%20with%20a%20simple%20experiment%20setup.%20Minimal%20equipment%20on%20a%20light-colored%20surface%2C%20focusing%20on%20the%20educational%20materials%20without%20clutter.&width=300&height=300&seq=img3&orientation=squarish"
+                    alt="Learning activity" class="w-64 h-64 object-cover object-top">
+            </div>
+            <div class="gallery-item relative shadow-lg rounded-lg overflow-hidden m-2 opacity-0 translate-x-[-100px] animate-slide-in"
+                style="--rotation: 4deg; animation-delay: 0.8s">
+                <img src="https://readdy.ai/api/search-image?query=A%20peaceful%20art%20corner%20with%20a%20single%20drawing%20and%20basic%20art%20supplies%20neatly%20arranged%20on%20a%20clean%20surface.%20Natural%20lighting%20and%20minimalist%20composition%20create%20a%20calming%20creative%20space.&width=300&height=300&seq=img4&orientation=squarish"
+                    alt="Learning activity" class="w-64 h-64 object-cover object-top">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Service Section -->
+    <section id="layanan" class="py-12 mt-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="relative">
+                        <span class="text-primary">Layanan</span>
+                        <span class="text-gray-800"> Kami</span>
+                        <span class="absolute bottom-0 left-0 w-full h-1 bg-primary/20 -z-10"
+                            style="bottom: -8px;"></span>
+                    </span>
+                </h2>
+                <p
+                    class="text-base md:text-lg text-gray-700 mb-8 md:mb-10 leading-relaxed max-w-2xl px-4 mx-auto text-center">
+                    Solusi lengkap untuk semua kebutuhan tugas akademik Anda dengan kualitas terjamin dan tepat waktu
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-file-text-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Pembuatan Makalah</h3>
+                    <p class="text-gray-600">
+                        Makalah berkualitas dengan referensi terpercaya dan format akademis yang rapi
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-article-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Pembuatan Jurnal</h3>
+                    <p class="text-gray-600">
+                        Jurnal ilmiah dengan analisis mendalam dan penulisan sesuai kaidah akademik
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-book-2-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Tugas Sekolah</h3>
+                    <p class="text-gray-600">
+                        Bantuan mengerjakan PR semua mata pelajaran (Matematika, IPA, IPS, Bahasa, dll)
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-slideshow-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Presentasi</h3>
+                    <p class="text-gray-600">
+                        Desain slide presentasi yang menarik dan profesional untuk kebutuhan akademik
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-code-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Pemrograman</h3>
+                    <p class="text-gray-600">
+                        Bantuan tugas coding berbagai bahasa pemrograman dengan penjelasan detail
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-video-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Les Online</h3>
+                    <p class="text-gray-600">
+                        Bimbingan belajar privat online untuk semua jenjang pendidikan
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-printer-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Print</h3>
+                    <p class="text-gray-600">
+                        Layanan cetak dan jilid untuk berbagai tugas, seperti makalah, jurnal, dan tugas sekolah lainnya
+                    </p>
+                </div>
+
+                <div class="service-card bg-white p-8 rounded-lg shadow-md text-center cursor-pointer">
+                    <div
+                        class="icon-wrapper w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-file-list-line text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Kuis & Ujian</h3>
+                    <p class="text-gray-600">
+                        Bantuan dalam mengerjakan kuis dan ujian online (ujian harian, mid, ujian akhir semester)
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Cara Joki Section-->
+    <section id="carajoki" class="py-12 mt-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Cara <span class="text-primary">Joki</span></h2>
+                <p
+                    class="text-base md:text-lg text-gray-700 mb-8 md:mb-10 leading-relaxed max-w-2xl px-4 mx-auto text-center">
+                    3 langkah mudah untuk mendapatkan bantuan tugas
+                </p>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-between max-w-4xl mx-auto">
+                <div class="text-center mb-8 md:mb-0">
+                    <div
+                        class="w-16 h-16 mx-auto flex items-center justify-center bg-primary text-white rounded-full mb-4 text-xl font-bold">
+                        1
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Kirim Form</h3>
+                    <p class="text-gray-600">Isi form pemesanan dengan detail tugas</p>
+                </div>
+                <div class="hidden md:block text-primary text-4xl">
+                    <i class="ri-arrow-right-line"></i>
+                </div>
+                <div class="text-center mb-8 md:mb-0">
+                    <div
+                        class="w-16 h-16 mx-auto flex items-center justify-center bg-primary text-white rounded-full mb-4 text-xl font-bold">
+                        2
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Chat Admin</h3>
+                    <p class="text-gray-600">Diskusi detail dan konfirmasi harga</p>
+                </div>
+                <div class="hidden md:block text-primary text-4xl">
+                    <i class="ri-arrow-right-line"></i>
+                </div>
+                <div class="text-center">
+                    <div
+                        class="w-16 h-16 mx-auto flex items-center justify-center bg-primary text-white rounded-full mb-4 text-xl font-bold">
+                        3
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Tugas Selesai</h3>
+                    <p class="text-gray-600">
+                        Terima hasil pengerjaan tepat waktu
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Form Section -->
+    <section id="form" class="py-12 mt-16 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    <span class="relative">
+                        <span class="text-primary">Form</span>
+                        <span class="text-gray-800"> Joki</span>
+                        <span class="absolute bottom-0 left-0 w-full h-1 bg-primary/20 -z-10"
+                            style="bottom: -8px;"></span>
+                    </span>
+                </h2>
+                <p
+                    class="text-base md:text-lg text-gray-700 mb-8 md:mb-10 leading-relaxed max-w-2xl px-4 mx-auto text-center">
+                    Isi formulir di bawah ini dan kami akan menghubungi Anda.
+                </p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <form id="assignmentForm" class="space-y-6" method="POST" action="/" enctype="multipart/form-data">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                            <input type="text" name="nama" required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nomor WhatsApp</label>
+                            <input type="tel" name="wa" required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+                                placeholder="Contoh: 081234567890" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Tugas</label>
+                            <div class="relative">
+                                <select name="jenis" required
+                                    class="form-input w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                                    placeholder="Pilih jenis tugas">
+                                    <option value="">Pilih jenis tugas</option>
+                                    <option value="Makalah">Makalah</option>
+                                    <option value="Presentasi">Presentasi</option>
+                                    <option value="Pemrograman">Pemrograman</option>
+                                    <option value="Jurnal">Jurnal</option>
+                                    <option value="Laporan Praktikum">Laporan Praktikum</option>
+                                    <option value="Esai">Esai</option>
+                                    <option value="Print">Print</option>
+                                    <option value="Tugas Matematika">Tugas Matematika</option>
+                                    <option value="Tugas Bahasa">Tugas Bahasa</option>
+                                    <option value="Tugas Kuis">Kuis</option>
+                                    <option value="Tugas Ujian">Ujian</option>
+                                    <option value="Tugas Lainnya">Tugas Lainnya</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Batas Waktu</label>
+                            <input type="date" name="deadline" required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Tugas</label>
+                        <textarea name="deskripsi" rows="4" required
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none resize-none"
+                            placeholder="Silakan tuliskan detail tugas, instruksi, dan format yang dibutuhkan..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Unggah File (Opsional)</label>
+                        <div id="uploadArea"
+                            class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <input type="file" name="file" multiple class="hidden" id="fileInput" />
+                            <label for="fileInput" class="cursor-pointer">
+                                <div
+                                    class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="ri-upload-cloud-line text-2xl text-gray-400"></i>
+                                </div>
+                                <p class="text-gray-600">Klik untuk mengunggah atau tarik file ke sini</p>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    PDF, DOC, DOCX, PPT, PPTX (Maksimal 10MB per file)
+                                </p>
+                            </label>
+                        </div>
+                        <!-- File list container -->
+                        <div id="fileList" class="mt-4 space-y-2 hidden">
+                            <!-- File items will be added here dynamically -->
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit"
+                            class="bg-primary text-white px-8 py-4 rounded-full text-lg font-semibold whitespace-nowrap hover:bg-purple-800 transition-colors w-full md:w-auto">
+                            Kirim Permintaan Tugas
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <a href="https://wa.me/6281234567890"
+        class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors">
+        <i class="ri-whatsapp-line text-2xl"></i>
+    </a>
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Joki Yok</h3>
+                    <p class="text-gray-400">
+                        Bantuan akademik profesional untuk pelajar dan mahasiswa.
+                        Hasil berkualitas, pengiriman tepat waktu, harga terjangkau.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Tautan Cepat</h4>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#layanan" class="text-gray-400 hover:text-white transition-colors">Layanan</a>
+                        </li>
+                        <li>
+                            <a href="#carajoki" class="text-gray-400 hover:text-white transition-colors">Cara Kerja</a>
+                        </li>
+                        <li>
+                            <a href="#form" class="text-gray-400 hover:text-white transition-colors">Joki Sekarang</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Kontak Kami</h4>
+                    <div class="space-y-2">
+                        <p class="text-gray-400 flex items-center">
+                            <i class="ri-whatsapp-line mr-2"></i>
+                            +62 812-3456-7890
+                        </p>
+                        <p class="text-gray-400 flex items-center">
+                            <i class="ri-mail-line mr-2"></i>
+                            info@jokiyok.com
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">
+                    &copy; 2025 Joki Yok. Seluruh hak cipta dilindungi.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
