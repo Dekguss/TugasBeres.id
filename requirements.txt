@@ -2,4 +2,5 @@ Flask
 Flask-Login
 pymongo
 python-dotenv
-Werkzeug
+Werkzeu
+gunicorn
