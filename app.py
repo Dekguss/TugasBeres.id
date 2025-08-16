@@ -37,8 +37,8 @@ orders = db['orders']  # Nama collection
 admins = db['admins']  # Nama collection
 
 # Konfigurasi upload folder
-app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'static/uploads')
-app.config['UPLOAD_FOLDER_FINISH'] = os.getenv('UPLOAD_FOLDER_FINISH', 'static/finish')
+app.config['UPLOAD_FOLDER'] = '/tmp/uploads'  # Gunakan /tmp di Vercel
+app.config['UPLOAD_FOLDER_FINISH'] = '/tmp/finish'  # Gunakan /tmp di Vercel
 
 # Buat folder upload jika belum ada
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
