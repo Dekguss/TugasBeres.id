@@ -37,19 +37,23 @@ orders = db['orders']  # Nama collection
 admins = db['admins']  # Nama collection
 
 # Konfigurasi upload folder
-app.config['UPLOAD_FOLDER'] = '/tmp/uploads'  # Gunakan /tmp di Vercel
-app.config['UPLOAD_FOLDER_FINISH'] = '/tmp/finish'  # Gunakan /tmp di Vercel
+UPLOAD_FOLDER = '/tmp/uploads'
+UPLOAD_FOLDER_FINISH = '/tmp/finish'
 
 # Buat folder upload jika belum ada
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['UPLOAD_FOLDER_FINISH'], exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER_FINISH, exist_ok=True)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER_FINISH'] = UPLOAD_FOLDER_FINISH
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Batas maksimal 16MB
 
 # Fungsi generate order code
 def generate_order_code(length=8):
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-    # Function to get status color
+# Function to get status color
 def get_status_color(status):
     status_map = {
         'Menunggu': 'bg-yellow-100 text-yellow-800',
@@ -71,6 +75,13 @@ def format_currency(value):
 app.jinja_env.filters['getStatusColor'] = get_status_color
 app.jinja_env.filters['format_currency'] = format_currency
 
+# Fungsi untuk membersihkan nama file
+def secure_filename(filename):
+    # Hanya izinkan karakter alfanumerik, titik, garis bawah, dan strip
+    import re
+    filename = re.sub(r'[^\w\-_.]', '', filename)
+    return filename
+
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -90,47 +101,43 @@ def index():
             'updated_at': datetime.now()
         }
 
-        # Simpan file jika ada
+        # Cek apakah file ada dalam request
+        if 'file' not in request.files:
+            flash('Tidak ada file yang diunggah', 'error')
+            return redirect(request.url)
+            
         file = request.files['file']
-        if file and file.filename != '':
-            # Dapatkan ekstensi file asli
-            file_ext = os.path.splitext(file.filename)[1]  # Contoh: '.pdf', '.docx', dll
-            # Buat nama file baru dengan format: kode_pesanan_nama.ekstensi
-            filename = f"{order_data['order_code']}_{order_data['nama']}{file_ext}"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # Jika user tidak memilih file
+        if file.filename == '':
+            flash('Tidak ada file yang dipilih', 'error')
+            return redirect(request.url)
             
-            # Simpan file
-            file.save(filepath)
-            order_data['file_path'] = filepath
-            order_data['file_name'] = filename
-            order_data['file_extension'] = file_ext.lower()  # Simpan ekstensi file juga
-
-        try:
-            # Simpan ke MongoDB
-            result = orders.insert_one(order_data)
-            order_id = str(result.inserted_id)
-            
-            # Format pesan WhatsApp
-            pesan = f'''
-Halo Admin, saya baru saja mengirim tugas:
-
-Kode Pemesanan: {order_data['order_code']}
-Nama: {order_data['nama']}
-Jenis Tugas: {order_data['jenis']}
-Deadline: {order_data['deadline']}
-WA Saya: {order_data['wa_pengguna']}
-Deskripsi: {order_data['deskripsi']}
-
-Mohon segera dicek ya 🙏
-            '''
-            pesan_encoded = quote(pesan)
-            return redirect(f'https://wa.me/6281529808370?text={pesan_encoded}')
-
-        # Jika terjadi kesalahan
-        except Exception as e:
-            flash('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.')
-            return redirect(url_for('index'))
-
+        if file:
+            try:
+                # Buat nama file yang aman
+                filename = secure_filename(file.filename)
+                # Tambahkan timestamp untuk menghindari konflik nama file
+                filename = f"{int(datetime.now().timestamp())}_{filename}"
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                
+                # Simpan file
+                file.save(filepath)
+                
+                # Simpan path file relatif ke database
+                order_data['file_path'] = filename
+                
+                # Simpan data order ke database
+                result = orders.insert_one(order_data)
+                
+                flash('Pesanan berhasil dibuat! Kode pesanan Anda: ' + order_data['order_code'], 'success')
+                return redirect(url_for('cek_order', order_code=order_data['order_code']))
+                
+            except Exception as e:
+                app.logger.error(f"Error saat mengunggah file: {str(e)}")
+                flash('Terjadi kesalahan saat mengunggah file', 'error')
+                return redirect(request.url)
+    
     return render_template('index.html')
 
 
@@ -342,22 +349,64 @@ def download_file(order_id):
     try:
         order = orders.find_one({'_id': ObjectId(order_id)})
         if not order or 'file_path' not in order:
-            return jsonify({'status': 'error', 'message': 'File not found'}), 404
+            flash('File tidak ditemukan', 'error')
+            return redirect(url_for('admin'))
             
-        # Get the directory and filename
-        directory = os.path.dirname(order['file_path'])
-        filename = os.path.basename(order['file_path'])
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], order['file_path'])
         
-        # Send the file for download
+        # Pastikan file ada
+        if not os.path.exists(file_path):
+            flash('File tidak ditemukan di server', 'error')
+            return redirect(url_for('admin'))
+            
+        # Dapatkan ekstensi file asli
+        file_ext = os.path.splitext(order['file_path'])[1]
+        # Nama file untuk diunduh
+        download_name = f"{order['nama']}_{order['order_code']}{file_ext}"
+        
         return send_from_directory(
-            directory=directory,
-            path=filename,
+            app.config['UPLOAD_FOLDER'],
+            order['file_path'],
             as_attachment=True,
-            download_name=order.get('file_name', 'file')
+            download_name=download_name
         )
         
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        app.logger.error(f"Error saat mengunduh file: {str(e)}")
+        flash('Terjadi kesalahan saat mengunduh file', 'error')
+        return redirect(url_for('admin'))
+
+@app.route('/download/<order_id>')
+def download_file(order_id):
+    try:
+        order = orders.find_one({'_id': ObjectId(order_id)})
+        if not order or 'file_path' not in order:
+            flash('File tidak ditemukan', 'error')
+            return redirect(url_for('admin'))
+            
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], order['file_path'])
+        
+        # Pastikan file ada
+        if not os.path.exists(file_path):
+            flash('File tidak ditemukan di server', 'error')
+            return redirect(url_for('admin'))
+            
+        # Dapatkan ekstensi file asli
+        file_ext = os.path.splitext(order['file_path'])[1]
+        # Nama file untuk diunduh
+        download_name = f"{order['nama']}_{order['order_code']}{file_ext}"
+        
+        return send_from_directory(
+            app.config['UPLOAD_FOLDER'],
+            order['file_path'],
+            as_attachment=True,
+            download_name=download_name
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error saat mengunduh file: {str(e)}")
+        flash('Terjadi kesalahan saat mengunduh file', 'error')
+        return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
