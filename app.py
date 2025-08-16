@@ -37,12 +37,14 @@ orders = db['orders']  # Nama collection
 admins = db['admins']  # Nama collection
 
 # Konfigurasi upload folder
-app.config['UPLOAD_FOLDER'] = '/tmp/uploads'  # Gunakan /tmp di Vercel
-app.config['UPLOAD_FOLDER_FINISH'] = '/tmp/finish'  # Gunakan /tmp di Vercel
+UPLOAD_FOLDER = '/tmp/uploads'
+UPLOAD_FOLDER_FINISH = '/tmp/finish'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER_FINISH'] = UPLOAD_FOLDER_FINISH
 
 # Buat folder upload jika belum ada
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['UPLOAD_FOLDER_FINISH'], exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER_FINISH, exist_ok=True)
 
 # Fungsi generate order code
 def generate_order_code(length=8):
@@ -97,13 +99,15 @@ def index():
             file_ext = os.path.splitext(file.filename)[1]  # Contoh: '.pdf', '.docx', dll
             # Buat nama file baru dengan format: kode_pesanan_nama.ekstensi
             filename = f"{order_data['order_code']}_{order_data['nama']}{file_ext}"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
             
-            # Simpan file
-            file.save(filepath)
-            order_data['file_path'] = filepath
-            order_data['file_name'] = filename
-            order_data['file_extension'] = file_ext.lower()  # Simpan ekstensi file juga
+            try:
+                file.save(filepath)
+                order_data['file_path'] = filename  # Simpan nama file saja, bukan path lengkap
+                order_data['file_name'] = filename
+                order_data['file_extension'] = file_ext.lower()  # Simpan ekstensi file juga
+            except Exception as e:
+                return f"Terjadi kesalahan: Gagal menyimpan file: {str(e)}"
 
         try:
             # Simpan ke MongoDB
