@@ -4,3 +4,5 @@ pymongo
 python-dotenv
 Werkzeug
 gunicorn
+cloudinary
+Flask-PyMongo
