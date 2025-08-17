@@ -4,27 +4,13 @@ import secrets
 from datetime import datetime
 from urllib.parse import quote
 import os
-import json
 from pymongo import MongoClient
-from bson.objectid import ObjectId
-from flask_pymongo import PyMongo
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from bson import ObjectId
 from dotenv import load_dotenv
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
-# Load environment variables
-load_dotenv()
-
-# Konfigurasi Cloudinary
-cloudinary.config(
-    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.getenv('CLOUDINARY_API_KEY'),
-    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
-    secure=True
-)
+load_dotenv() 
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -49,10 +35,6 @@ client = MongoClient(os.getenv('MONGODB_URI'))
 db = client[os.getenv('DB_NAME')]  # Nama database
 orders = db['orders']  # Nama collection
 admins = db['admins']  # Nama collection
-
-# Inisialisasi Flask-PyMongo
-app.config["MONGO_URI"] = os.getenv('MONGODB_URI')
-mongo = PyMongo(app)
 
 # Konfigurasi upload folder
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'  # Gunakan /tmp di Vercel
@@ -250,16 +232,22 @@ def get_order(order_id):
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@app.route('/admin/orders/<order_id>', methods=['PUT'])
+@app.route('/admin/orders/<order_id>/update', methods=['POST'])
 @login_required
 def update_order(order_id):
     try:
+        print("\n=== DEBUG: Mulai update order ===")
+        print("Request files:", request.files)
+        print("Request form:", request.form)
+        
         data = request.form
         order_data = orders.find_one({'_id': ObjectId(order_id)})
         
         if not order_data:
-            return jsonify({'status': 'error', 'message': 'Order tidak ditemukan'}), 404
+            print("Error: Order tidak ditemukan")
+            return jsonify({'status': 'error', 'message': 'Order not found'}), 404
         
+        # Inisialisasi update_data dengan nilai default
         update_data = {
             'status': data.get('status', 'Menunggu'),
             'harga': data.get('harga', 0),
@@ -269,72 +257,107 @@ def update_order(order_id):
         # Handle file upload
         if 'finishedFile' in request.files:
             file = request.files['finishedFile']
-            if file.filename != '':
+            print(f"File received: {file.filename}")
+            
+            if file and file.filename != '':
+                # Dapatkan ekstensi file asli
+                file_ext = os.path.splitext(file.filename)[1].lower()
+                print(f"File extension: {file_ext}")
+                
+                # Buat nama file dengan format: kode_pesanan_timestamp.ekstensi
+                timestamp = int(datetime.now().timestamp())
+                filename = f"{order_data['order_code']}_Finish{file_ext}"
+                
+                # Path lengkap untuk menyimpan file
+                upload_dir = os.path.join('static', 'finish')
+                os.makedirs(upload_dir, exist_ok=True)  # Pastikan folder ada
+                filepath = os.path.join(upload_dir, filename)
+                
+                print(f"Saving to: {filepath}")
+                
                 try:
-                    # Upload ke Cloudinary
-                    upload_result = cloudinary.uploader.upload(
-                        file,
-                        folder="tugas_beres",  # Folder di Cloudinary
-                        resource_type="auto"
-                    )
+                    # Simpan file
+                    file.save(filepath)
+                    print("File saved successfully")
                     
-                    # Simpan URL file dan public_id ke database
-                    update_data['file_url'] = upload_result['secure_url']
-                    update_data['file_public_id'] = upload_result['public_id']
+                    # Update path file di database (simpan path relatif)
+                    update_data['finished_file'] = f"static/finish/{filename}"
+                    print(f"File akan disimpan di database sebagai: {update_data['finished_file']}")
+                    
+                    # Hapus file lama jika ada
+                    old_file = order_data.get('finished_file', '')
+                    if old_file:
+                        old_filepath = os.path.join('static', old_file)
+                        if os.path.exists(old_filepath):
+                            try:
+                                os.remove(old_filepath)
+                                print(f"Old file deleted: {old_filepath}")
+                            except Exception as e:
+                                print(f"Gagal menghapus file lama {old_filepath}: {str(e)}")
                     
                 except Exception as e:
-                    print(f"Error uploading to Cloudinary: {str(e)}")
-                    return jsonify({'status': 'error', 'message': 'Gagal mengupload file'}), 500
-
-        # Update data di database
-        orders.update_one(
+                    print(f"Error saving file: {str(e)}")
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Gagal menyimpan file: {str(e)}',
+                        'error_type': type(e).__name__
+                    }), 500
+        
+        # Update order di database
+        print(f"Updating database with: {update_data}")
+        result = orders.update_one(
             {'_id': ObjectId(order_id)},
             {'$set': update_data}
         )
         
-        return jsonify({'status': 'success', 'message': 'Order berhasil diupdate'})
+        # Ambil data terbaru untuk memastikan
+        updated_order = orders.find_one({'_id': ObjectId(order_id)})
+        print(f"Updated order data: {updated_order}")
+        print("=== DEBUG: Update selesai ===\n")
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Order berhasil diperbarui',
+            'data': {
+                'order_id': str(updated_order['_id']),
+                'status': update_data['status'],
+                'finished_file': updated_order.get('finished_file', '')
+            }
+        })
         
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        print(f"Unexpected error: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error', 
+            'message': f'Terjadi kesalahan: {str(e)}',
+            'error_type': type(e).__name__
+        }), 500
 
 @app.route('/admin/orders/<order_id>/download')
 @login_required
 def download_file(order_id):
     try:
         order = orders.find_one({'_id': ObjectId(order_id)})
-        if not order or 'file_url' not in order:
-            return jsonify({'status': 'error', 'message': 'File tidak ditemukan'}), 404
+        if not order or 'file_path' not in order:
+            return jsonify({'status': 'error', 'message': 'File not found'}), 404
             
-        # Redirect ke URL file di Cloudinary
-        return redirect(order['file_url'])
+        # Get the directory and filename
+        directory = os.path.dirname(order['file_path'])
+        filename = os.path.basename(order['file_path'])
         
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'status': 'error', 'message': 'Gagal mendownload file'}), 500
-
-@app.route('/admin/orders/<order_id>/delete_file', methods=['DELETE'])
-@login_required
-def delete_file(order_id):
-    try:
-        order = orders.find_one({'_id': ObjectId(order_id)})
-        if not order or 'file_public_id' not in order:
-            return jsonify({'status': 'error', 'message': 'File tidak ditemukan'}), 404
-            
-        # Hapus file dari Cloudinary
-        cloudinary.uploader.destroy(order['file_public_id'])
-        
-        # Update data di database
-        orders.update_one(
-            {'_id': ObjectId(order_id)},
-            {'$unset': {'file_url': '', 'file_public_id': ''}}
+        # Send the file for download
+        return send_from_directory(
+            directory=directory,
+            path=filename,
+            as_attachment=True,
+            download_name=order.get('file_name', 'file')
         )
         
-        return jsonify({'status': 'success', 'message': 'File berhasil dihapus'})
-        
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({'status': 'error', 'message': 'Gagal menghapus file'}), 500
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
