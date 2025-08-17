@@ -5,6 +5,7 @@ from datetime import datetime
 from urllib.parse import quote
 import os
 import json
+from pymongo import MongoClient
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -48,6 +49,10 @@ client = MongoClient(os.getenv('MONGODB_URI'))
 db = client[os.getenv('DB_NAME')]  # Nama database
 orders = db['orders']  # Nama collection
 admins = db['admins']  # Nama collection
+
+# Inisialisasi Flask-PyMongo
+app.config["MONGO_URI"] = os.getenv('MONGODB_URI')
+mongo = PyMongo(app)
 
 # Konfigurasi upload folder
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'  # Gunakan /tmp di Vercel
